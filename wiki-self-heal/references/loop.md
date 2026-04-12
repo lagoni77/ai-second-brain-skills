@@ -17,9 +17,11 @@ The complete numbered procedure for a `wiki-self-heal` run. SKILL.md has the sum
    - `git status --porcelain` → must be empty. If dirty, stop and ask user to commit or stash.
 
 3. **Ask about MCPs** (once per session):
-   > Do you have any of these MCPs installed for higher-quality research? (a) Apify, (b) Firecrawl, (c) Exa. Reply with letters or "none".
+   > I'll default to WebSearch + WebFetch for research. If you have any of these MCPs installed for higher-quality sources, let me know which and I'll prefer them: Apify, Firecrawl, Exa.
 
-   Remember the answer for this run. Default: WebSearch + WebFetch only.
+   Remember the answer for this run. Default: WebSearch + WebFetch only. Never block the loop on this — if the user is unresponsive, proceed with the default.
+
+4. **Determine mode**: full (default) or audit-only. Audit-only runs when the user said "dry run", "just audit", "audit only", "don't make changes", or "show me the gaps first". If unsure, ask once before creating the branch.
 
 4. **Create branch**:
    ```bash

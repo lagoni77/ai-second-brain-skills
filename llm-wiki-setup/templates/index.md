@@ -7,7 +7,7 @@ Each entry: `- [[page-name]] — one-line summary`
 ## Entities
 
 <!-- People, organizations, products, concrete things.
-     Example: - [[karpathy]] — AI researcher, OpenAI founding member, coined "vibe coding" -->
+     Example: - [[andrej-karpathy]] — AI researcher, OpenAI founding member, coined "vibe coding" -->
 
 ## Concepts
 
@@ -23,3 +23,8 @@ Each entry: `- [[page-name]] — one-line summary`
 
 <!-- Comparisons, syntheses, answers filed back from queries.
      Example: - [[rag-vs-wiki-comparison]] — tradeoffs between traditional RAG and the wiki pattern -->
+
+## Audits
+
+<!-- Health-check reports produced by the wiki-self-heal skill.
+     Example: - [[audit-2026-04-11]] — first self-heal pass, 12 gaps found -->
