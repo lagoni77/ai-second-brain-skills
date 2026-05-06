@@ -86,56 +86,67 @@ Context, references, and examples that a skill needs should live **inside the sk
 
 ---
 
-## Memory: Three Separate Things
+## Memory: Three Separate Things (Plus One Rare)
 
-This is the most misunderstood layer. Memory is not one thing. It has three distinct components that belong in different places.
+This is the most misunderstood layer. Memory is not one thing. Match the data shape to the right container.
 
-### 1. Knowledge
-What Claude needs to know to act on your behalf: your voice, business context, who you serve, what good output looks like. Lives in:
-- `CLAUDE.md` at the project root (global context, prepended to every prompt)
-- Reference files and examples inside each skill folder (local context, loaded per skill)
-- External docs system (Notion, Confluence, etc.) accessed via MCP when needed globally
+| Component | What it is | Change rate | Store in |
+|---|---|---|---|
+| **Context** | Who you are, what you do, how you do it — voice, processes, offer | Slow | Markdown (`CLAUDE.md`, skill refs) |
+| **State** | What's happening right now — leads, tasks, pipeline, statuses | Fast | SQLite / Supabase / Airtable |
+| **Memory** | What Claude learns and keeps — preferences, corrections, rules | Organic | Atomic `.md` files or Claude's native memory |
+| **RAG** | Big external knowledge vault — 1000s of docs, semantic search | Rare | Vector DB |
 
-### 2. State
-The current status of things moving through workflows — lead pipeline stage, which notes have been processed, task completion tracking. Lives in:
-- A simple database: Airtable, SQLite, a spreadsheet
-- **Not** markdown files — databases were built for this, markdown was not
+Context, State, and Memory are the defaults. RAG is the exception.
 
-### 3. Learned Memory
-What Claude discovers about you through working together — patterns, preferences, corrections. Lives in:
-- Claude's own memory feature — let it build organically
-- Supplemented by explicit rules added to `CLAUDE.md` when a pattern repeats
+### Context
+Who you are, what you do, how you do it. Slow-changing. Lives in:
+- `CLAUDE.md` at the project root (global — prepended to every prompt)
+- Reference files and examples inside each skill folder (local — loaded per skill)
 
-### What About RAG?
-Most people will never need it. RAG is for semantic search across thousands of documents. For a personal wiki or small team:
-- Claude reads markdown files directly — no vector database needed
-- Keyword matching in a database handles most "find this thing" use cases
-- Hybrid RAG (mixing semantic + keyword) is what actually works reliably in production, which makes it complex to set up correctly
+### State
+What's happening right now. Fast-changing. Lives in:
+- A database: SQLite, Supabase, Airtable, a spreadsheet
+- **Not** markdown files — databases handle fast-changing records; markdown was not built for this
 
-**Rule:** Only reach for RAG if you've hit a concrete wall where Claude can't find what it needs from direct file reads or database queries.
+### Memory (Learned)
+What Claude discovers through working with you — preferences, corrections, rules. Lives in:
+- Claude's native memory — let it build organically
+- Small atomic `.md` files for explicit rules you want locked in
+
+### RAG
+Semantic search across thousands of documents. Rarely needed. Before reaching for it:
+- Claude reads markdown files directly — sufficient for most personal wikis
+- A database keyword query handles most "find this record" use cases
+- Hybrid RAG (semantic + keyword together) is what actually works reliably in production — complex to set up correctly
+
+**Rule:** Only add RAG when you've hit a wall where direct file reads and database queries genuinely can't find what Claude needs.
 
 ---
 
-## What Obsidian Is (and Is Not)
+## Two Decision Frameworks
 
-This is worth stating clearly because it is widely oversold.
+### Framework 1: Data Shape → Container
+Before choosing a tool, ask: what is the shape of this data?
+- Slow-changing identity/process info → markdown
+- Fast-changing status/records → database
+- AI-learned patterns → atomic md or native memory
+- Massive external knowledge base → vector DB (rare)
 
-**What Obsidian actually does:**
-- Provides a UI over local markdown files
-- Backlinks, graph view, and semantic search are for **the human**, not for Claude
-- Claude does not use backlinks. Claude does not use the graph. There is no reliable MCP for semantic search via CLI.
+### Framework 2: Will a Human Read It?
+The engine and the cockpit are different things. **Apps are for humans. Files last, apps change.**
 
-**When Obsidian makes sense:**
-- You personally want a visual layer to browse and read your knowledge base
-- You prefer it over Notion as a human interface
-- Your use case is personal (not team — Obsidian is poor for collaboration)
+```
+Will a human read this?
+├── Yes → pick by your reader
+│   ├── Solo / technical  →  Obsidian, Bear
+│   └── Team / non-tech   →  Notion, Coda
+└── No  → Claude reads .md files directly, no UI needed
+```
 
-**When it does not make sense:**
-- You are building it for a business or team (Notion wins on collaboration)
-- You expect Claude to use its graph/search features — it won't
-- You are migrating out of a working system just because a YouTube video said to
+Claude does not need a pretty UI to do its work. The AI layer reads files. The human layer browses apps. Don't conflate them — an app chosen for the human should not drive architectural decisions for the AI.
 
-**For the wiki project specifically:** Obsidian is fine as the human-readable interface for browsing the wiki. But the skills that generate wiki content should carry their own context internally, and state tracking (e.g. which raw notes have been converted) should live in a simple database, not in Obsidian markdown.
+**Practical implication for the wiki:** The wiki articles are for humans to read → pick the UI that suits your reader. The skills that generate those articles are for Claude → they live in the skill folder as `.md` files with no UI required.
 
 ---
 
